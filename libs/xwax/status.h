@@ -17,26 +17,28 @@
  *
  */
 
-#ifndef LUT_H
-#define LUT_H
+/*
+ * Implement a global one-line status console
+ */
 
-typedef unsigned int slot_no_t;
+#ifndef STATUS_H
+#define STATUS_H
 
-struct slot {
-    unsigned int timecode;
-    slot_no_t next; /* next slot with the same hash */
-};
+#include <stdarg.h>
 
-struct lut {
-    struct slot *slot;
-    slot_no_t *table, /* hash -> slot lookup */
-        avail; /* next available slot */
-};
+#include "observer.h"
 
-int lut_init(struct lut *lut, int nslots);
-void lut_clear(struct lut *lut);
+#define STATUS_VERBOSE 0
+#define STATUS_INFO    1
+#define STATUS_WARN    2
+#define STATUS_ALERT   3
 
-void lut_push(struct lut *lut, unsigned int timecode);
-unsigned int lut_lookup(struct lut *lut, unsigned int timecode);
+extern struct event status_changed;
+
+const char* status(void);
+int status_level(void);
+
+void status_set(int level, const char *s);
+void status_printf(int level, const char *s, ...);
 
 #endif

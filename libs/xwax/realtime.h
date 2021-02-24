@@ -17,26 +17,45 @@
  *
  */
 
-#ifndef LUT_H
-#define LUT_H
+#ifndef REALTIME_H
+#define REALTIME_H
 
-typedef unsigned int slot_no_t;
+#include <poll.h>
+#include <pthread.h>
+#include <semaphore.h>
+#include <stdbool.h>
 
-struct slot {
-    unsigned int timecode;
-    slot_no_t next; /* next slot with the same hash */
+/*
+ * State data for the realtime thread, maintained during rt_start and
+ * rt_stop
+ */
+
+struct rt {
+    pthread_t ph;
+    sem_t sem;
+    bool finished;
+    int priority;
+
+    size_t ndv;
+    struct device *dv[3];
+
+    size_t nctl;
+    struct controller *ctl[3];
+
+    size_t npt;
+    struct pollfd pt[32];
 };
 
-struct lut {
-    struct slot *slot;
-    slot_no_t *table, /* hash -> slot lookup */
-        avail; /* next available slot */
-};
+int rt_global_init();
+void rt_not_allowed();
 
-int lut_init(struct lut *lut, int nslots);
-void lut_clear(struct lut *lut);
+void rt_init(struct rt *rt);
+void rt_clear(struct rt *rt);
 
-void lut_push(struct lut *lut, unsigned int timecode);
-unsigned int lut_lookup(struct lut *lut, unsigned int timecode);
+int rt_add_device(struct rt *rt, struct device *dv);
+int rt_add_controller(struct rt *rt, struct controller *c);
+
+int rt_start(struct rt *rt, int priority);
+void rt_stop(struct rt *rt);
 
 #endif

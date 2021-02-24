@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Mark Hills <mark@xwax.org>
+ * Copyright (C) 2012 Mark Hills <mark@xwax.org>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,26 +17,39 @@
  *
  */
 
-#ifndef LUT_H
-#define LUT_H
+#include <stdio.h>
 
-typedef unsigned int slot_no_t;
+#include "rig.h"
+#include "thread.h"
+#include "track.h"
 
-struct slot {
-    unsigned int timecode;
-    slot_no_t next; /* next slot with the same hash */
-};
+/*
+ * Self-contained manual test of a track import operation
+ */
 
-struct lut {
-    struct slot *slot;
-    slot_no_t *table, /* hash -> slot lookup */
-        avail; /* next available slot */
-};
+int main(int argc, char *argv[])
+{
+    struct track *track;
 
-int lut_init(struct lut *lut, int nslots);
-void lut_clear(struct lut *lut);
+    if (argc != 3) {
+        fprintf(stderr, "usage: %s <command> <path>\n", argv[0]);
+        return -1;
+    }
 
-void lut_push(struct lut *lut, unsigned int timecode);
-unsigned int lut_lookup(struct lut *lut, unsigned int timecode);
+    if (thread_global_init() == -1)
+        return -1;
 
-#endif
+    rig_init();
+
+    track = track_acquire_by_import(argv[1], argv[2]);
+    if (track == NULL)
+        return -1;
+
+    rig_main();
+
+    track_release(track);
+    rig_clear();
+    thread_global_clear();
+
+    return 0;
+}

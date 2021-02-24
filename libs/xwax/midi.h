@@ -17,26 +17,24 @@
  *
  */
 
-#ifndef LUT_H
-#define LUT_H
+#ifndef MIDI_H
+#define MIDI_H
 
-typedef unsigned int slot_no_t;
+#include <alsa/asoundlib.h>
 
-struct slot {
-    unsigned int timecode;
-    slot_no_t next; /* next slot with the same hash */
+/*
+ * State information for an open, non-blocking MIDI device
+ */
+
+struct midi {
+    snd_rawmidi_t *in, *out;
 };
 
-struct lut {
-    struct slot *slot;
-    slot_no_t *table, /* hash -> slot lookup */
-        avail; /* next available slot */
-};
+int midi_open(struct midi *m, const char *name);
+void midi_close(struct midi *m);
 
-int lut_init(struct lut *lut, int nslots);
-void lut_clear(struct lut *lut);
-
-void lut_push(struct lut *lut, unsigned int timecode);
-unsigned int lut_lookup(struct lut *lut, unsigned int timecode);
+ssize_t midi_pollfds(struct midi *m, struct pollfd *pe, size_t len);
+ssize_t midi_read(struct midi *m, void *buf, size_t len);
+ssize_t midi_write(struct midi *m, const void *buf, size_t len);
 
 #endif

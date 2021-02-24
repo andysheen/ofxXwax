@@ -22,8 +22,8 @@ void ofxXwax::setup(unsigned int sampleRate, unsigned int bufferSize, string for
 	this->format = format;
 	
 	float speed = 1.0; // 1.0 is 33 1/3, 1.35 is 45 rpm
-	timecoder_init(&timecoder, format.c_str(), speed, sampleRate);
-	
+	timecoder_init(&timecoder, timecoder_find_definition(format.c_str()), speed, sampleRate,false);
+
 	shortBuffer.resize(nChannels * bufferSize);
 }
 
@@ -35,7 +35,7 @@ void ofxXwax::update(float* input) {
 	
 	timecoder_submit(&timecoder, &shortBuffer[0], bufferSize);
 	
-	float when;
+	double when;
 	float curPosition = timecoder_get_position(&timecoder, &when);
 	
 	pitch = timecoder_get_pitch(&timecoder);

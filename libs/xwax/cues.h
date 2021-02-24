@@ -17,26 +17,28 @@
  *
  */
 
-#ifndef LUT_H
-#define LUT_H
+#ifndef CUES_H
+#define CUES_H
 
-typedef unsigned int slot_no_t;
+#include <math.h>
 
-struct slot {
-    unsigned int timecode;
-    slot_no_t next; /* next slot with the same hash */
+#define MAX_CUES 16
+#define CUE_UNSET (HUGE_VAL)
+
+/*
+ * A set of cue points
+ */
+
+struct cues {
+    double position[MAX_CUES];
 };
 
-struct lut {
-    struct slot *slot;
-    slot_no_t *table, /* hash -> slot lookup */
-        avail; /* next available slot */
-};
+void cues_reset(struct cues *q);
 
-int lut_init(struct lut *lut, int nslots);
-void lut_clear(struct lut *lut);
-
-void lut_push(struct lut *lut, unsigned int timecode);
-unsigned int lut_lookup(struct lut *lut, unsigned int timecode);
+void cues_unset(struct cues *q, unsigned int label);
+void cues_set(struct cues *q, unsigned int label, double position);
+double cues_get(const struct cues *q, unsigned int label);
+double cues_prev(const struct cues *q, double current);
+double cues_next(const struct cues *q, double current);
 
 #endif

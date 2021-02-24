@@ -17,26 +17,13 @@
  *
  */
 
-#ifndef LUT_H
-#define LUT_H
+#ifndef INTERFACE_H
+#define INTERFACE_H
 
-typedef unsigned int slot_no_t;
+#include "deck.h"
+#include "library.h"
 
-struct slot {
-    unsigned int timecode;
-    slot_no_t next; /* next slot with the same hash */
-};
-
-struct lut {
-    struct slot *slot;
-    slot_no_t *table, /* hash -> slot lookup */
-        avail; /* next available slot */
-};
-
-int lut_init(struct lut *lut, int nslots);
-void lut_clear(struct lut *lut);
-
-void lut_push(struct lut *lut, unsigned int timecode);
-unsigned int lut_lookup(struct lut *lut, unsigned int timecode);
+int interface_start(struct library *lib, const char *geo, bool decor);
+void interface_stop();
 
 #endif

@@ -17,26 +17,30 @@
  *
  */
 
-#ifndef LUT_H
-#define LUT_H
+/*
+ * Utility functions for launching external processes
+ */
 
-typedef unsigned int slot_no_t;
+#ifndef EXTERNAL_H
+#define EXTERNAL_H
 
-struct slot {
-    unsigned int timecode;
-    slot_no_t next; /* next slot with the same hash */
+#include <stdarg.h>
+#include <unistd.h>
+
+/*
+ * A handy read buffer; an equivalent of fread() but for
+ * non-blocking file descriptors
+ */
+
+struct rb {
+    char buf[4096];
+    size_t len;
 };
 
-struct lut {
-    struct slot *slot;
-    slot_no_t *table, /* hash -> slot lookup */
-        avail; /* next available slot */
-};
+pid_t fork_pipe(int *fd, const char *path, char *arg, ...);
+pid_t fork_pipe_nb(int *fd, const char *path, char *arg, ...);
 
-int lut_init(struct lut *lut, int nslots);
-void lut_clear(struct lut *lut);
-
-void lut_push(struct lut *lut, unsigned int timecode);
-unsigned int lut_lookup(struct lut *lut, unsigned int timecode);
+void rb_reset(struct rb *rb);
+ssize_t get_line(int fd, struct rb *rb, char **string);
 
 #endif

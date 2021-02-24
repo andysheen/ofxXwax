@@ -17,26 +17,20 @@
  *
  */
 
-#ifndef LUT_H
-#define LUT_H
+#ifndef XWAX_H
+#define XWAX_H
 
-typedef unsigned int slot_no_t;
+#include "deck.h"
 
-struct slot {
-    unsigned int timecode;
-    slot_no_t next; /* next slot with the same hash */
-};
+extern char *banner;
 
-struct lut {
-    struct slot *slot;
-    slot_no_t *table, /* hash -> slot lookup */
-        avail; /* next available slot */
-};
+#define NOTICE \
+  "This software is supplied WITHOUT ANY WARRANTY; without even the implied\n"\
+  "warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. This is\n"\
+  "free software, and you are welcome to redistribute it under certain\n"\
+  "conditions; see the file COPYING for details."
 
-int lut_init(struct lut *lut, int nslots);
-void lut_clear(struct lut *lut);
-
-void lut_push(struct lut *lut, unsigned int timecode);
-unsigned int lut_lookup(struct lut *lut, unsigned int timecode);
+extern size_t ndeck;
+extern struct deck deck[];
 
 #endif

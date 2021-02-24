@@ -17,26 +17,11 @@
  *
  */
 
-#ifndef LUT_H
-#define LUT_H
+#ifndef JACK_H
+#define JACK_H
 
-typedef unsigned int slot_no_t;
+#include "device.h"
 
-struct slot {
-    unsigned int timecode;
-    slot_no_t next; /* next slot with the same hash */
-};
-
-struct lut {
-    struct slot *slot;
-    slot_no_t *table, /* hash -> slot lookup */
-        avail; /* next available slot */
-};
-
-int lut_init(struct lut *lut, int nslots);
-void lut_clear(struct lut *lut);
-
-void lut_push(struct lut *lut, unsigned int timecode);
-unsigned int lut_lookup(struct lut *lut, unsigned int timecode);
+int jack_init(struct device *dv, const char *name);
 
 #endif
